@@ -2,10 +2,13 @@
 const orderModels = require("../models/orderModels");
 const foodModels = require("../models/foodModels");
 const tableModels = require('../models/tableModels')
+const kitchenModule = require('../models/kitchenModels')
+const io = require('../index')
 
 const orderControllers = {
   //order mon an
   creatOrder: async (req, res) => {
+    const io = req.io
     const {
       IDAccountOrder,
       NameAccountOrder,
@@ -44,8 +47,18 @@ const orderControllers = {
         status,
       }).save();
 
-      await tableModels.find({ IDnumber: tableNumberID }).updateOne({ StatusTable: true })
+      //tạo đơn chổ nấu
+      await kitchenModule({
+        IDAccountOrder,
+        NameAccountOrder,
+        codeBill: numberID,
+        OrderNumberIDFood,
+        tableNumberID,
+      }).save()
 
+      await tableModels.find({ IDnumber: tableNumberID }).updateOne({ StatusTable: true })
+      io.emit('statusOrder', { status: 'NewOrder' })
+      io.emit('statusOrderK', { status: 'NewOrder' })
       return res.status(200).json({ message: "Gọi món thành công" });
     } catch (error) {
       console.log(error);
@@ -108,12 +121,16 @@ const orderControllers = {
 
   //xoa hoa don
   deleteOrder: async (req, res) => {
+    const io = req.io
     const ID = req.params.id
-    const { idTable } = req.body
+    const { idTable, codeBill } = req.body
     try {
       await orderModels.findByIdAndDelete({ _id: ID })
       await tableModels.findByIdAndUpdate({ _id: idTable }, { StatusTable: false })
+      await kitchenModule.find({codeBill}).deleteOne()
 
+      io.emit('statusOrder', { status: 'DeleteOrder' })
+      io.emit('statusOrderK', { status: 'DeleteOrder' })
       return res.status(200).json({ message: "Huỷ đơn thành công" });
     } catch (error) {
       return res.status(500).json({ message: "Vui lòng thử lại sau" });
