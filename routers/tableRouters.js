@@ -31,6 +31,7 @@ router.get("/get-all-table-full-data-t", tableControllers.getAllTableAndDataTrue
 router.post("/get-all-table-by-secter-full-data", tableControllers.getAllTableBySecterFullData)
 //lấy table theo khu vực full data và có khách
 router.post("/get-all-table-by-secter-full-data-t", tableControllers.getAllTableBySecterFullDataTrue)
-
+//lấy chi tiết một bàn theo tableNumberId và full data
+router.post("/get-detail-table-by-idnumber-f", tableControllers.getdetailTableByIDNumberFullData)
 
 module.exports = router;

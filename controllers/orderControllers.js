@@ -127,7 +127,7 @@ const orderControllers = {
     try {
       await orderModels.findByIdAndDelete({ _id: ID })
       await tableModels.findByIdAndUpdate({ _id: idTable }, { StatusTable: false })
-      await kitchenModule.find({codeBill}).deleteOne()
+      await kitchenModule.find({ codeBill }).deleteOne()
 
       io.emit('statusOrder', { status: 'DeleteOrder' })
       io.emit('statusOrderK', { status: 'DeleteOrder' })
@@ -252,6 +252,41 @@ const orderControllers = {
       return res.status(500).json({ message: "Vui lòng thử lại sau" });
     }
   },
+
+  //lấy một đơn theo IDnumber bàn chi tieets
+  getDetailOrderAndFoodDetailByCodeBill: async (req, res) => {
+    const { codeBill } = req.body;
+
+    try {
+      const data = await orderModels.aggregate([
+        // { $match: { $expr: { $eq: ['$_id', { $toObjectId: ID }] } } },
+        {
+          $match: { codeBill: { $eq: codeBill }, }
+        },
+        {
+          $lookup: {
+            from: "foods",
+            localField: "OrderNumberIDFood.IDFood",
+            foreignField: "IDnumber",
+            as: "Food",
+          },
+        },
+        {
+          $lookup: {
+            from: "tables",
+            localField: "tableNumberID",
+            foreignField: "IDnumber",
+            as: "Table",
+          },
+        },
+      ]);
+
+      return res.status(200).json({ data });
+    } catch (error) {
+      return res.status(500).json({ message: "Vui lòng thử lại sau" });
+    }
+  },
+
   //chuyển bàn cập nhật lại bàn trong order
   changeTable: async (req, res) => {
     const { tableNumberID } = req.body
@@ -278,6 +313,54 @@ const orderControllers = {
       await tableModels.find({ IDnumber: tableNumberID }).updateOne({ StatusTable: false })
 
       return res.status(200).json({ message: 'Chuyển bàn thành công' })
+    } catch (error) {
+      return res.status(500).json({ message: "Vui lòng thử lại sau" });
+    }
+  },
+
+  //lấy một đơn chi tiết full data và bàn
+  getDetailOrderAndFoodDetailByCodeBillAndTable: async (req, res) => {
+    const { codeBill } = req.body;
+
+    try {
+      const data = await orderModels.aggregate([
+        // { $match: { $expr: { $eq: ['$_id', { $toObjectId: ID }] } } },
+        {
+          $match: { codeBill: { $eq: codeBill }, }
+        },
+        {
+          $lookup: {
+            from: "foods",
+            localField: "OrderNumberIDFood.IDFood",
+            foreignField: "IDnumber",
+            as: "Food",
+          },
+        },
+        {
+          $lookup: {
+            from: "tables",
+            localField: "tableNumberID",
+            foreignField: "IDnumber",
+            as: "Table",
+          },
+        },
+      ]);
+
+      //lay full data ban
+      const dataTable = await tableModels.aggregate([
+        { $match: { IDnumber: { $eq: data[0].tableNumberID } } },
+        {
+          $lookup: {
+            from: "sectors",
+            localField: "IDnumberSector",
+            foreignField: "IDnumber",
+            as: "Sector",
+          },
+        },
+        { $sort: { Sector: 1 } }
+      ])
+
+      return res.status(200).json({ data: data, dataTable: dataTable });
     } catch (error) {
       return res.status(500).json({ message: "Vui lòng thử lại sau" });
     }

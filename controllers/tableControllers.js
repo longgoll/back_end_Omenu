@@ -309,6 +309,34 @@ const tableControllers = {
     } catch (error) {
       return res.status(500).json({ message: "Vui lòng thử lại sau" });
     }
+  },
+
+//lấy chi tiết một bàn theo tableNumberId và full data
+  getdetailTableByIDNumberFullData: async (req, res) => {
+    const { IDnumber } = req.body
+
+    if (!IDnumber) {
+      return res.status(401).json({ message: 'Vui lòng nhập IDnumber' })
+    }
+
+    try {
+      const data = await tableModels.aggregate([
+        { $match: { IDnumber: { $eq: IDnumber } } },
+        {
+          $lookup: {
+            from: "sectors",
+            localField: "IDnumberSector",
+            foreignField: "IDnumber",
+            as: "Sector",
+          },
+        },
+        { $sort: { Sector: 1 } }
+      ])
+
+      return res.status(200).json(data);
+    } catch (error) {
+      return res.status(500).json({ message: "Vui lòng thử lại sau" });
+    }
   }
 };
 
