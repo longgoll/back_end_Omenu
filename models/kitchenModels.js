@@ -50,6 +50,10 @@ const kitchenSchema = new Schema(
       type: String,
       query: true,
     },
+    //phục vụ
+    service: {
+      type: Boolean,
+    }
   },
   { timestamps: true }
 );

@@ -11,6 +11,7 @@ const kitchenControllers = {
                     Complete: false
                 }]
             }).sort({ createdAt: 1 })
+            
 
             return res.status(200).json({ data })
         } catch (error) {
@@ -41,7 +42,7 @@ const kitchenControllers = {
                     status: true,
                     Complete: true
                 }]
-            }).sort({ createdAt: 1 })
+            }).sort({ createdAt: -1 })
 
             return res.status(200).json({ data })
         } catch (error) {
@@ -69,7 +70,7 @@ const kitchenControllers = {
         const { idkitchenModule } = req.body
 
         try {
-            await kitchenModule.findByIdAndUpdate({ _id: idkitchenModule }, { Complete: true })
+            await kitchenModule.findByIdAndUpdate({ _id: idkitchenModule }, { Complete: true, service: false })
 
             return res.status(200).json({ message: 'Đơn hoàn thành' })
         } catch (error) {
