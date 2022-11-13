@@ -3,7 +3,6 @@ const orderModels = require("../models/orderModels");
 const foodModels = require("../models/foodModels");
 const tableModels = require('../models/tableModels')
 const kitchenModule = require('../models/kitchenModels')
-const io = require('../index')
 
 const orderControllers = {
   //order mon an
@@ -127,7 +126,7 @@ const orderControllers = {
     try {
       await orderModels.findByIdAndDelete({ _id: ID })
       await tableModels.findByIdAndUpdate({ _id: idTable }, { StatusTable: false })
-      await kitchenModule.find({ codeBill }).deleteOne()
+      await kitchenModule.find({ codeBill }).deleteMany()
 
       io.emit('statusOrder', { status: 'DeleteOrder' })
       io.emit('statusOrderK', { status: 'DeleteOrder' })
@@ -225,7 +224,6 @@ const orderControllers = {
 
     try {
       const data = await orderModels.aggregate([
-        // { $match: { $expr: { $eq: ['$_id', { $toObjectId: ID }] } } },
         {
           $match: { tableNumberID: { $eq: tableNumberID }, }
         },

@@ -68,10 +68,12 @@ const serviceControllers = {
     //xác nhận đẫ phục vụ
     changeServiced: async (req, res) => {
         const { id } = req.body
+        const io = req.io
 
         try {
             await kitchenModule.findByIdAndUpdate({ _id: id }, { service: true })
 
+            io.emit('OrderComplete', { status: 'OrderComplete' })
             return res.status(200).json({ message: 'Nhận đơn phục vụ thành công' })
         } catch (error) {
             return res.status(500).json({ message: "Vui lòng thử lại sau" });

@@ -71,9 +71,9 @@ app.use(bodyParser.json());
 
 io.on("connection", (socket) => {
   //   socket.id = "dawdhiuahidawd"+1;
-  console.log(`User Connected: ${socket.id}`);
+  // console.log(`User Connected: ${socket.id}`);
   socket.on("disconnect", () => {
-    console.log("ngat ket noi: " + socket.id);
+    // console.log("ngat ket noi: " + socket.id);
   });
 });
 
