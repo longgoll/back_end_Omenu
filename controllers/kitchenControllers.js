@@ -140,6 +140,19 @@ const kitchenControllers = {
             return res.status(500).json({ message: "Vui lòng thử lại sau" });
         }
     },
+
+    //lấy trạng thái dựa vào IDnumber bàn
+    getDetailOrderAndFoodDetailByNumberTable: async (req, res) => {
+        const { tableNumberID } = req.body
+
+        try {
+            const data = await await kitchenModule.find({ tableNumberID }).sort({createdAt: 1})
+
+            return res.status(200).json({ data });
+        } catch (error) {
+            return res.status(500).json({ message: "Vui lòng thử lại sau" });
+        }
+    }
 }
 
 module.exports = kitchenControllers

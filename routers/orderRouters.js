@@ -7,6 +7,8 @@ const orderControllers = require('../controllers/orderControllers');
 router.post("/create-order", orderControllers.creatOrder)
 //Cập nhật order
 router.put("/update-order/:id", orderControllers.updateOrder)
+//Cập nhật order
+router.post("/update-order-number-table", orderControllers.updateOrderByNumberTable)
 //huy order
 router.post("/delete-order/:id", orderControllers.deleteOrder)
 //lấy tất cả đơn order

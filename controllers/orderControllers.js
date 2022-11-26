@@ -118,6 +118,58 @@ const orderControllers = {
 
   },
 
+  //cập nhật order theo number Table
+  updateOrderByNumberTable: async (req, res) => {
+    //order mon an
+    const {
+      IDAccountOrder,
+      NameAccountOrder,
+      codeBill,
+      OrderNumberIDFood,
+      tableNumberID,
+      amount,
+      status,
+    } = req.body;
+
+    // if (!IDAccountOrder) {
+    //   return res.status(401).json({ message: "ID người đặt hiện rỗng" });
+    // }
+
+    // if (!NameAccountOrder) {
+    //   return res.status(401).json({ message: "Vui lòng thêm tên" });
+    // }
+
+    // if (!OrderNumberIDFood) {
+    //   return res.status(401).json({ message: "Vòng lòng chọn món" });
+    // }
+
+    // if (!tableNumberID) {
+    //   return res.status(401).json({ message: "Vòng lòng chọn bàn" });
+    // }
+
+    try {
+      //tạo id
+      const numberID = new Date().getTime();
+      await orderModels.find({ tableNumberID: tableNumberID }).updateOne({
+        IDAccountOrder,
+        NameAccountOrder,
+        codeBill,
+        OrderNumberIDFood,
+        amount,
+        status,
+        tableNumberID,
+      })
+
+      await tableModels.find({ IDnumber: tableNumberID }).updateOne({ StatusTable: true })
+
+      return res.status(200).json({ message: "Thêm món thành công" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Vui lòng thử lại sau" });
+    }
+
+  },
+
   //xoa hoa don
   deleteOrder: async (req, res) => {
     const io = req.io

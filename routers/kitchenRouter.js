@@ -17,5 +17,7 @@ router.post("/confirm-order", kitchenControllers.confirmOrder)
 router.post("/confirm-order-complete", kitchenControllers.confirmOrderComplete)
 //lấy một đơn chi tiết full data
 router.post("/get-detail-orderk-by-id", kitchenControllers.getDetailOrderAndFoodDetailByid)
+//lấy trạng thái dựa vào IDnumber bàn
+router.post("/get-detail-orderk-by-numbertable", kitchenControllers.getDetailOrderAndFoodDetailByNumberTable)
 
 module.exports = router;
