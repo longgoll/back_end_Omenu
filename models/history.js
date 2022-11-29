@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const OrderSchema = new Schema(
+const OrderhistorySchema = new Schema(
   {
     //Tài khoản order
     IDAccountOrder: {
@@ -58,5 +58,5 @@ const OrderSchema = new Schema(
   { timestamps: true }
 );
 //
-const OrderModule = mongoose.model("Order", OrderSchema);
-module.exports = OrderModule;
+const OrderhistoryModule = mongoose.model("OrderHistory", OrderhistorySchema);
+module.exports = OrderhistoryModule;

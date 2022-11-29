@@ -7,6 +7,10 @@ const orderControllers = require('../controllers/orderControllers');
 router.post("/create-order", orderControllers.creatOrder)
 //Cập nhật order
 router.put("/update-order/:id", orderControllers.updateOrder)
+//Xác nhận khách đã xong
+router.post("/done", orderControllers.Done)
+//thanh toán
+router.post("/payment-order", orderControllers.PaymentOrder)
 //Cập nhật order
 router.post("/update-order-number-table", orderControllers.updateOrderByNumberTable)
 //huy order
@@ -29,5 +33,9 @@ router.put("/change-table", orderControllers.changeTable)
 router.put("/change-table-merge", orderControllers.changeTableMerge)
 //lấy một đơn chi tiết full data và bàn
 router.post("/get-detail-order-by-codebill-ftable", orderControllers.getDetailOrderAndFoodDetailByCodeBillAndTable)
+//lấy thống kê đơn
+router.get("/statistical", orderControllers.getStatistical)
+//lấy thống kê đơn theo ngay
+router.post("/statistical-by-date", orderControllers.getStatisticalbydate)
 
 module.exports = router;

@@ -3,6 +3,10 @@ const orderModels = require("../models/orderModels");
 const foodModels = require("../models/foodModels");
 const tableModels = require('../models/tableModels')
 const kitchenModule = require('../models/kitchenModels')
+const OrderhistoryModule = require('../models/history')
+
+//time
+const moment = require("moment");
 
 const orderControllers = {
   //order mon an
@@ -44,6 +48,7 @@ const orderControllers = {
         tableNumberID,
         amount,
         status,
+        Done: false,
       }).save();
 
       //tạo đơn chổ nấu
@@ -61,6 +66,50 @@ const orderControllers = {
       return res.status(200).json({ message: "Gọi món thành công" });
     } catch (error) {
       console.log(error);
+      return res.status(500).json({ message: "Vui lòng thử lại sau" });
+    }
+  },
+
+  //khách hàng đã xong
+  Done: async (req, res) => {
+    const { ID, tableNumberID } = req.body
+
+    try {
+      // await orderModels.findByIdAndUpdate({ _id: ID }, { Done: true })
+      const data = await orderModels.findById({ _id: ID }, { _id: 0 })
+      if (data.payment === false) {
+        return res.status(401).json({ message: "Vui lòng thanh toán" });
+      }
+      await orderModels.findByIdAndDelete({ _id: ID })
+      await tableModels.findOneAndUpdate({ IDnumber: tableNumberID }, { StatusTable: false })
+      await OrderhistoryModule({
+        IDAccountOrder: data.IDAccountOrder,
+        NameAccountOrder: data.NameAccountOrder,
+        codeBill: data.codeBill,
+        OrderNumberIDFood: data.OrderNumberIDFood,
+        tableNumberID: data.tableNumberID,
+        amount: data.amount,
+        status: data.status,
+        Done: data.Done,
+        payment: data.payment
+      }).save()
+
+      return res.status(200).json({ message: "Bàn đã trống" });
+
+    } catch (error) {
+      return res.status(500).json({ message: "Vui lòng thử lại sau" });
+    }
+  },
+
+  //thanh toán
+  PaymentOrder: async (req, res) => {
+    const { ID } = req.body
+
+    try {
+      await orderModels.findByIdAndUpdate({ _id: ID }, { payment: true })
+
+      return res.status(200).json({ message: "Thanh toán thành công" });
+    } catch (error) {
       return res.status(500).json({ message: "Vui lòng thử lại sau" });
     }
   },
@@ -411,6 +460,35 @@ const orderControllers = {
       ])
 
       return res.status(200).json({ data: data, dataTable: dataTable });
+    } catch (error) {
+      return res.status(500).json({ message: "Vui lòng thử lại sau" });
+    }
+  },
+
+  //thống kê
+  getStatistical: async (req, res) => {
+    try {
+      const data = await OrderhistoryModule.find({ payment: true }).sort({ createdAt: -1 })
+
+      return res.status(200).json({ data });
+    } catch (error) {
+      return res.status(500).json({ message: "Vui lòng thử lại sau" });
+    }
+  },
+
+  //thống kê theo ngay
+  getStatisticalbydate: async (req, res) => {
+    const { date } = req.body
+    try {
+      const data = await OrderhistoryModule.find({
+        $and: [
+          { createdAt: { $gte: moment(date).format("YYYY-MM-DDT00:00:00") } },
+          { createdAt: { $lte: moment(date).format("YYYY-MM-DDT23:59:59") } },
+          { payment: true }
+        ],
+      }).sort({ createdAt: -1 })
+
+      return res.status(200).json({ data });
     } catch (error) {
       return res.status(500).json({ message: "Vui lòng thử lại sau" });
     }
